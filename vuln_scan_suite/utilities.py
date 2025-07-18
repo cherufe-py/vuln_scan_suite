@@ -25,3 +25,14 @@ def handle_host_argument(raw_host) -> str:
 def is_a_valid_ipv4(ip) -> bool:
     """Returns True if the ip passed as parameter is a valid IPv4."""
     return bool(re.fullmatch(r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$", ip))
+
+
+def get_ttl_value_from_ping_response(value: str) -> int:
+    """Returns the ttl value from a ping response passed as parameter."""
+    pattern = r"(?i)ttl=\s*(\d+)"
+    match = re.search(pattern, value)
+
+    if match:
+        return int(match.group(1))
+    else:
+        return -1

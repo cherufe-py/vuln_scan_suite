@@ -1,11 +1,13 @@
 """
 This script contains the tools for attack surface recognition,
 """
+import platform
 import socket
+import subprocess
 
 from tqdm import tqdm
 
-from vuln_scan_suite.utilities import handle_ports_argument
+from vuln_scan_suite.utilities import handle_ports_argument, get_ttl_value_from_ping_response
 
 
 def scan_ports(host, ports):
@@ -30,3 +32,25 @@ def scan_port(host, port):
         tqdm.write(f"{host_port} - {port} is Closed/Filtered")
 
     s.close()
+
+def get_os(host):
+    """Gets OS from IP. It uses ping command to guess the OS."""
+    if "win" in platform.system().lower():
+        ping_command = ["ping", host]
+    else:
+        ping_command = ["ping", "-c", "1", host]
+
+    response = subprocess.run(ping_command, capture_output=True, text=True)
+    ttl = get_ttl_value_from_ping_response(response.stdout)
+
+    if ttl == -1:
+        print("Host is not available.")
+        return
+    if ttl <= 64:
+        so = "Linux/Unix"
+    elif ttl <= 128:
+        so = "Windows"
+    else:
+        so = "Unknown"
+
+    print(f"TTL: {ttl} - Successful against SO: {so}")
