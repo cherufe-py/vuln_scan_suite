@@ -7,6 +7,7 @@ from vuln_scan_suite.attack_surface_recognition import get_os, scan_ports
 
 
 def main():
+    """Main function."""
     while True:
         option = print_main_menu_and_get_option()
         clear_screen()
