@@ -1,3 +1,6 @@
+"""
+Use this file to run the suite.
+"""
 import argparse
 
 from vuln_scan_suite.attack_surface_recognition import scan_ports

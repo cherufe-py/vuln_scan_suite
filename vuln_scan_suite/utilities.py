@@ -11,7 +11,7 @@ def handle_ports_argument(raw_ports) -> List[int]:
     if '-' in raw_ports:
         raw_ports = raw_ports.split('-')
         return list(range(int(raw_ports[0]), int(raw_ports[1]) + 1))
-    elif ',' in raw_ports:
+    if ',' in raw_ports:
         return [int(port) for port in raw_ports.split(',')]
     return [int(raw_ports)]
 
