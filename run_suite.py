@@ -1,35 +1,48 @@
 """
 Use this file to run the suite.
 """
-import argparse
+import os
 
-from vuln_scan_suite.attack_surface_recognition import scan_ports
+from vuln_scan_suite.attack_surface_recognition import get_os, scan_ports
 
 
 def main():
-    """Main function to run the suite"""
-    parser = argparse.ArgumentParser(
-        description='args'
-    )
+    """Main function."""
+    while True:
+        option = print_main_menu_and_get_option()
+        clear_screen()
+        if option == "1":
+            host_and_ports = print_get_host_and_ports_panel()
+            clear_screen()
+            get_os(host_and_ports.get('host'))
+            scan_ports(*host_and_ports.values())
+            input("Results on screen. Press any key to continue...")
+            clear_screen()
+        elif option == "0":
+            break
 
-    parser.add_argument(
-        '--host',
-        type=str,
-        help='Host to scant',
-        default='192.168.1.183'
-    )
 
-    parser.add_argument(
-        '--ports',
-        type=str,
-        help='Ports to scan. It receives elements divided by comma ("80, 22") '
-             'or hyphen for range ("20-9000").',
-        default="80,22"
-    )
+def print_main_menu_and_get_option():
+    """Print main menu and returns the option selected."""
+    print("=" * 20)
+    print("=" * 20)
+    print("Main menu")
+    print("1- Perform attack surface recognition.")
+    print("0- Exit Suite.")
+    print("=" * 20)
+    return input("Choose an option: ")
 
-    args = parser.parse_args()
 
-    scan_ports(args.host, args.ports)
+def print_get_host_and_ports_panel() -> dict:
+    """Print panel to get host and ports from user."""
+    ip = input("Provide an IP or Domain: ")
+    ports = input("Provide ports to scan (keep blank to scan the commonest): ")
+    return {"host": ip, "ports": ports}
+
+
+def clear_screen():
+    """Clears screen."""
+    os.system('cls' if os.name == 'nt' else 'clear')
 
 
 if __name__ == "__main__":
