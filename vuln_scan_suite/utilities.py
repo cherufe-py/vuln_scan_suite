@@ -32,7 +32,4 @@ def get_ttl_value_from_ping_response(value: str) -> int:
     pattern = r"(?i)ttl=\s*(\d+)"
     match = re.search(pattern, value)
 
-    if match:
-        return int(match.group(1))
-    else:
-        return -1
+    return int(match.group(1)) if match else -1

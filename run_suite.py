@@ -22,6 +22,7 @@ def main():
 
 
 def print_main_menu_and_get_option():
+    """Print main menu and returns the option selected."""
     print("=" * 20)
     print("=" * 20)
     print("Main menu")
@@ -32,12 +33,14 @@ def print_main_menu_and_get_option():
 
 
 def print_get_host_and_ports_panel() -> dict:
+    """Print panel to get host and ports from user."""
     ip = input("Provide an IP or Domain: ")
     ports = input("Provide ports to scan (keep blank to scan the commonest): ")
     return {"host": ip, "ports": ports}
 
 
 def clear_screen():
+    """Clears screen."""
     os.system('cls' if os.name == 'nt' else 'clear')
 
 

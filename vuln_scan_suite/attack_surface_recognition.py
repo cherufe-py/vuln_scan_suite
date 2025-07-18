@@ -40,7 +40,7 @@ def get_os(host):
     else:
         ping_command = ["ping", "-c", "1", host]
 
-    response = subprocess.run(ping_command, capture_output=True, text=True)
+    response = subprocess.run(ping_command, capture_output=True, text=True, check=True)
     ttl = get_ttl_value_from_ping_response(response.stdout)
 
     if ttl == -1:
