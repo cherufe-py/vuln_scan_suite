@@ -4,6 +4,7 @@ from vuln_scan_suite.attack_surface_recognition import scan_ports
 
 
 def main():
+    """Main function to run the suite"""
     parser = argparse.ArgumentParser(
         description='args'
     )
@@ -18,7 +19,8 @@ def main():
     parser.add_argument(
         '--ports',
         type=str,
-        help='Ports to scan. It receives elements divided by comma ("80, 22") or hyphen for range ("20-9000").',
+        help='Ports to scan. It receives elements divided by comma ("80, 22") '
+             'or hyphen for range ("20-9000").',
         default="80,22"
     )
 

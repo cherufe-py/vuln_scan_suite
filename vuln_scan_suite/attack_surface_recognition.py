@@ -1,3 +1,6 @@
+"""
+This script contains the tools for attack surface recognition,
+"""
 import socket
 
 from tqdm import tqdm
