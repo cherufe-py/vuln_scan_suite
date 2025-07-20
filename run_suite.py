@@ -4,6 +4,7 @@ Use this file to run the suite.
 import os
 
 from vuln_scan_suite.attack_surface_recognition import get_os, scan_ports
+from vuln_scan_suite.services_and_vulnerabilities import scan_port_and_service_version, scan_ports_and_service_versions
 
 
 def main():
@@ -17,6 +18,11 @@ def main():
                 clear_screen()
                 get_os(host_and_ports.get('host'))
                 scan_ports(*host_and_ports.values())
+                input("Results on screen. Press any key to continue...")
+                clear_screen()
+            case "2":
+                host_and_ports = print_get_host_and_ports_panel()
+                scan_ports_and_service_versions(*host_and_ports.values())
                 input("Results on screen. Press any key to continue...")
                 clear_screen()
             case "0":
@@ -33,6 +39,7 @@ def print_main_menu_and_get_option():
     print("=" * 20)
     print("Main menu")
     print("1- Perform attack surface recognition.")
+    print("1- Get Services and Vulnerabilities.")
     print("0- Exit Suite.")
     print("=" * 20)
     return input("Choose an option: ")
