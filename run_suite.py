@@ -11,15 +11,20 @@ def main():
     while True:
         option = print_main_menu_and_get_option()
         clear_screen()
-        if option == "1":
-            host_and_ports = print_get_host_and_ports_panel()
-            clear_screen()
-            get_os(host_and_ports.get('host'))
-            scan_ports(*host_and_ports.values())
-            input("Results on screen. Press any key to continue...")
-            clear_screen()
-        elif option == "0":
-            break
+        match option:
+            case "1":
+                host_and_ports = print_get_host_and_ports_panel()
+                clear_screen()
+                get_os(host_and_ports.get('host'))
+                scan_ports(*host_and_ports.values())
+                input("Results on screen. Press any key to continue...")
+                clear_screen()
+            case "0":
+                print("Bye")
+                break
+            case _:
+                pass
+
 
 
 def print_main_menu_and_get_option():
