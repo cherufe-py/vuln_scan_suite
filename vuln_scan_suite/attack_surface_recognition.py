@@ -1,5 +1,5 @@
 """
-This script contains the tools for attack surface recognition,
+This module contains the tools for attack surface recognition,
 """
 import platform
 import socket

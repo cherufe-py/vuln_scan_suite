@@ -1,3 +1,6 @@
+"""
+This module contains the tools to scan ports for service info and vulnerabilities.
+"""
 import socket
 
 from tqdm import tqdm
@@ -31,6 +34,7 @@ def scan_port_and_service_version(host: str, port: int):
 
 
 def get_banner_from_port(sock, host: str, port: int):
+    """Gets the banner from port with service info."""
     match port:
         case 22:
             try:
