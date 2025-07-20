@@ -38,7 +38,7 @@ def print_main_menu_and_get_option():
     print("=" * 20)
     print("Main menu")
     print("1- Perform attack surface recognition.")
-    print("1- Get Services and Vulnerabilities.")
+    print("2- Get Services and Vulnerabilities.")
     print("0- Exit Suite.")
     print("=" * 20)
     return input("Choose an option: ")
