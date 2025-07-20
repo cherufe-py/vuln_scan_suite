@@ -4,7 +4,7 @@ Use this file to run the suite.
 import os
 
 from vuln_scan_suite.attack_surface_recognition import get_os, scan_ports
-from vuln_scan_suite.services_and_vulnerabilities import scan_port_and_service_version, scan_ports_and_service_versions
+from vuln_scan_suite.services_and_vulnerabilities import scan_ports_and_service_versions
 
 
 def main():
@@ -30,7 +30,6 @@ def main():
                 break
             case _:
                 pass
-
 
 
 def print_main_menu_and_get_option():
