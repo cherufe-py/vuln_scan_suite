@@ -1,8 +1,10 @@
 """
 This module contains the tools to scan ports for service info and vulnerabilities.
 """
+import re
 import socket
 import ssl
+from typing import List
 
 from vuln_scan_suite.utilities import handle_ports_argument
 
@@ -54,16 +56,16 @@ def get_banner_from_port(sock, host: str, port: int):
             service_info = get_banner_from_port_21(sock)
         case _:
             service_info = get_banner_from_generic_port(sock, port)
-    print(service_info)
+    print(clean_service_version(service_info))
 
 
 def get_banner_from_port_22(sock):
     """Gets banner from port 22."""
     try:
         banner = sock.recv(1024).decode('utf-8', errors='ignore').strip()
-        return f"SSH: {banner}"
+        return banner
     except Exception as e:
-        return f"SSH: Error - {e}"
+        return "Undefined"
 
 
 def get_banner_from_port_21(sock):
@@ -71,19 +73,18 @@ def get_banner_from_port_21(sock):
     try:
         banner = sock.recv(1024).decode('utf-8', errors='ignore').strip()
         first_line = banner.split('\n')[0]
-        return f"FTP: {first_line}"
+        return first_line
     except Exception as e:
-        return f"FTP: Error - {e}"
+        return "Undefined"
 
 
 def get_banner_from_generic_port(sock, port: int):
     """Gets banner from general port."""
     try:
         banner = sock.recv(4096).decode('utf-8', errors='ignore').strip()
-        return f"GENERIC ({port}): {banner[:100]}..." if len(
-            banner) > 100 else f"GENERIC ({port}): {banner}"
+        return banner[:100] if len(banner) > 100 else banner
     except Exception as e:
-        return f"GENERIC ({port}): Error - {e}"
+        return "Undefined"
 
 
 def get_banner_from_port_http(sock, host: str):
@@ -104,6 +105,10 @@ def get_banner_from_port_http(sock, host: str):
         response_str = response.decode('utf-8', errors='ignore')
         server_header = next((line for line in response_str.split('\n') if line.lower().startswith('server:')),
                              None)
-        return f"HTTP: {server_header.strip()}" if server_header else "HTTP: No 'Server' header found."
+        return server_header.strip() if server_header else "Undefined"
     except Exception as e:
-        return f"HTTP: Error - {e}"
+        return "Undefined"
+
+
+def clean_service_version(raw_service_version: str) -> List[str]:
+    return re.sub(r"[ ()/\\_\-:]", ";", raw_service_version).split(";")
