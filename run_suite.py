@@ -4,6 +4,7 @@ Use this file to run the suite.
 import os
 
 from vuln_scan_suite.attack_surface_recognition import get_os, scan_ports
+from vuln_scan_suite.cve_searcher import CveSearcher
 from vuln_scan_suite.services_and_vulnerabilities import scan_ports_and_service_versions
 
 
@@ -22,7 +23,14 @@ def main():
                 clear_screen()
             case "2":
                 host_and_ports = print_get_host_and_ports_panel()
-                scan_ports_and_service_versions(*host_and_ports.values())
+                scanned_ports = scan_ports_and_service_versions(*host_and_ports.values())
+                cve_searcher = CveSearcher()
+                for scanned_port in scanned_ports:
+                    cves = cve_searcher.perform_clean_search_by_keywords(scanned_port.get('service_version'))
+                    for index, cve in enumerate(cves):
+                        desc = cve.get("description", "")
+                        short_desc = desc if len(desc) <= 100 else desc[:100] + "..."
+                        print(f"{index} - CVE link: {cve.get('link')}\nDescription: {short_desc}")
                 input("Results on screen. Press any key to continue...")
                 clear_screen()
             case "0":

@@ -9,20 +9,23 @@ from typing import List
 from vuln_scan_suite.utilities import handle_ports_argument
 
 
-def scan_ports_and_service_versions(host: str, ports: str):
+def scan_ports_and_service_versions(host: str, ports: str) -> List[dict]:
     """Scans ports of the host."""
     ports = handle_ports_argument(ports)
+    response = []
     for port in ports:
-        scan_port_and_service_version(host, port)
+        response.append(scan_port_and_service_version(host, port))
+    return response
 
 
-def scan_port_and_service_version(host: str, port: int):
+def scan_port_and_service_version(host: str, port: int) -> dict:
     """Scans port of the host."""
     host_port = f"Host: {host} - Port: {port}"
     print(f"Starting scanning for - {host_port}")
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.settimeout(2)
 
+    response = {'host': host, 'port': port}
     if port == 443:
         context = ssl.create_default_context()
         context.check_hostname = False
@@ -38,14 +41,17 @@ def scan_port_and_service_version(host: str, port: int):
 
     if result == 0:
         print(f"{host_port} - {port} is OPEN")
-        get_banner_from_port(connection_socket, host, port)
+        response.update(
+            {'status': 'Open', 'service_version': get_service_information_from_port(connection_socket, host, port)})
     else:
+        response.update({'status': 'Closed/Filtered', 'service_version': 'Undefined'})
         print(f"{host_port} - {port} is Closed/Filtered")
 
     s.close()
+    return response
 
 
-def get_banner_from_port(sock, host: str, port: int):
+def get_service_information_from_port(sock, host: str, port: int) -> list[str]:
     """Gets the banner from port with service info."""
     match port:
         case 22:
@@ -55,8 +61,9 @@ def get_banner_from_port(sock, host: str, port: int):
         case 21:
             service_info = get_banner_from_port_21(sock)
         case _:
-            service_info = get_banner_from_generic_port(sock, port)
-    print(clean_service_version(service_info))
+            service_info = get_banner_from_generic_port(sock)
+    response = clean_service_version(service_info)
+    return response
 
 
 def get_banner_from_port_22(sock):
@@ -78,7 +85,7 @@ def get_banner_from_port_21(sock):
         return "Undefined"
 
 
-def get_banner_from_generic_port(sock, port: int):
+def get_banner_from_generic_port(sock):
     """Gets banner from general port."""
     try:
         banner = sock.recv(4096).decode('utf-8', errors='ignore').strip()
@@ -111,4 +118,36 @@ def get_banner_from_port_http(sock, host: str):
 
 
 def clean_service_version(raw_service_version: str) -> List[str]:
-    return re.sub(r"[ ()/\\_\-:]", ";", raw_service_version).split(";")
+    tokens = re.sub(r"[ ()/\\_\-:]+", ";", raw_service_version).split(";")
+
+    cleaned = []
+    original = []
+    for token in tokens:
+        if not token:
+            continue
+
+        token_lower = token.lower()
+
+        patch_match = re.match(r"(\d+\.\d+\.\d+)p\d+", token)
+        if patch_match:
+            token = patch_match.group(1)
+
+        version_match = re.match(r"(\d+\.\d+)\.\d+$", token)
+        if version_match:
+            token = version_match.group(1)
+
+        original.append(token)
+
+        if token_lower in ["server", "ubuntu"]:
+            continue
+        if re.fullmatch(r"(ssh|tls|ssl|http|ftp|imap|pop3|smtp|dns)[\d.]*", token_lower):
+            continue
+        if re.fullmatch(r"\d\.\d", token_lower):
+            continue
+
+        cleaned.append(token)
+
+    if cleaned:
+        return cleaned
+    else:
+        return original

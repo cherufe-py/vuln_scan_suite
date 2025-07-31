@@ -33,3 +33,13 @@ def get_ttl_value_from_ping_response(value: str) -> int:
     match = re.search(pattern, value)
 
     return int(match.group(1)) if match else -1
+
+
+def contains_digit(text: str) -> bool:
+    """Returns true if the text passed as parameter contains a digit."""
+    return bool(re.search(r'\d', text))
+
+
+def count_dots(text: str) -> int:
+    """Returns the quantity of dots on a text."""
+    return text.count(".")
