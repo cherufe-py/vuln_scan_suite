@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<!-- Run this file with python -m http.server. Then access it on http://localhost:8000/xss_test.html-->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>XSS Test Page</title>
+    <script>
+        document.cookie = "session=12345; path=/";
+    </script>
+</head>
+<body>
+    <h1>Reflected XSS Test</h1>
+
+    <form method="GET" action="xss_test.html">
+        <label for="name">Enter your name:</label>
+        <input type="text" name="name" id="name">
+        <button type="submit">Submit</button>
+    </form>
+
+    <hr>
+
+    <p>Hello,
+        <span id="output"></span>
+    </p>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const name = params.get("name");
+        if (name) {
+            document.getElementById("output").innerHTML = name;
+        }
+    </script>
+</body>
+</html>
