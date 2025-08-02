@@ -1,5 +1,5 @@
 """
-This script contains the tools for attack surface recognition,
+This module contains the tools for attack surface recognition,
 """
 import platform
 import socket
@@ -10,14 +10,14 @@ from tqdm import tqdm
 from vuln_scan_suite.utilities import handle_ports_argument, get_ttl_value_from_ping_response
 
 
-def scan_ports(host, ports):
+def scan_ports(host: str, ports: str):
     """Scans ports of the host."""
     ports = handle_ports_argument(ports)
     for port in tqdm(ports, desc="Scanning..."):
         scan_port(host, port)
 
 
-def scan_port(host, port):
+def scan_port(host: str, port: int):
     """Scans port of the host."""
     host_port = f"Host: {host} - Port: {port}"
     tqdm.write(f"Starting scanning for - {host_port}")
@@ -33,7 +33,8 @@ def scan_port(host, port):
 
     s.close()
 
-def get_os(host):
+
+def get_os(host: str):
     """Gets OS from IP. It uses ping command to guess the OS."""
     if "win" in platform.system().lower():
         ping_command = ["ping", host]
