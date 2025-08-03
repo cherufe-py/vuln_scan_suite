@@ -4,33 +4,20 @@ from urllib.parse import urlparse
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
+from tqdm import tqdm
 
 from vuln_scan_suite.browser import Browser
-
-FORM_IDENTIFIERS = [
-    'action',
-    'name',
-    'id'
-]
-
-FIRST_PAYLOAD_CONTENT = "666"
-SECOND_PAYLOAD_CONTENT = "document.cookie"
-
-XSS_PAYLOADS = [
-    "<script>alert(%s)</script>",
-    "\"'><img src=x onerror=alert(%s)>",
-    "<svg/onload=alert(%s)>",
-    "';alert(%s);//",
-]
+from vuln_scan_suite.constants import FIRST_PAYLOAD_CONTENT, FORM_IDENTIFIERS
+from vuln_scan_suite.utilities import get_xss_payloads
 
 
-def scan_xss(url, wait_time=3):
-    browser = Browser(headless=False)
+def scan_xss_for_dynamic_page(url, wait_time=3):
+    browser = Browser(headless=True)
     forms_identifiers = get_forms_identifiers(url, browser)
 
     found_xss = []
-    for i, forms_identifier in enumerate(forms_identifiers, 1):
-        for payload in get_xss_payloads(FIRST_PAYLOAD_CONTENT):
+    for forms_identifier in forms_identifiers,:
+        for payload in tqdm(get_xss_payloads(FIRST_PAYLOAD_CONTENT), desc="Scanning forms..."):
             form = browser.driver.find_element(By.XPATH, f"//form{forms_identifier}")
             for text_input in get_input_text_webelements(form):
                 text_input.send_keys(payload)
@@ -42,7 +29,6 @@ def scan_xss(url, wait_time=3):
                 found_xss.append(payload)
         sleep(wait_time)
     browser.quit()
-    print("Found XSS: ", found_xss)
     return found_xss
 
 
@@ -75,10 +61,6 @@ def get_textarea_webelements(form: WebElement) -> List[WebElement]:
     return form.find_elements(By.TAG_NAME, "textarea")
 
 
-def get_xss_payloads(payload_content) -> List[str]:
-    return [payload % payload_content for payload in XSS_PAYLOADS]
-
-
 if __name__ == "__main__":
     target = input("Enter target URL (e.g. http://localhost/test): ")
-    scan_xss(target)
+    scan_xss_for_dynamic_page(target)

@@ -5,6 +5,8 @@ import re
 import socket
 from typing import List
 
+from vuln_scan_suite.constants import XSS_PAYLOADS
+
 
 def handle_ports_argument(raw_ports: str) -> List[int]:
     """Converts string ports parameter into a list of integers."""
@@ -43,3 +45,7 @@ def contains_digit(text: str) -> bool:
 def count_dots(text: str) -> int:
     """Returns the quantity of dots on a text."""
     return text.count(".")
+
+
+def get_xss_payloads(payload_content) -> List[str]:
+    return [payload.replace("REPLACE", payload_content) for payload in XSS_PAYLOADS]

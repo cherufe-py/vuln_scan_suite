@@ -6,6 +6,8 @@ import os
 from vuln_scan_suite.attack_surface_recognition import get_os, scan_ports
 from vuln_scan_suite.cve_searcher import CveSearcher
 from vuln_scan_suite.services_and_vulnerabilities import scan_ports_and_service_versions
+from vuln_scan_suite.xss_scanner_for_dynamic_page import scan_xss_for_dynamic_page
+from vuln_scan_suite.xss_scanner_for_static_page import scan_xss_for_static_page
 
 
 def main():
@@ -33,10 +35,33 @@ def main():
                         print(f"{index} - CVE link: {cve.get('link')}\nDescription: {short_desc}")
                 input("Results on screen. Press any key to continue...")
                 clear_screen()
+            case "3":
+                clear_screen()
+                ip = input("Provide an IP or Domain: ")
+                print("Scanning for XSS vulnerabilities for static pages.")
+                static_found_xss = scan_xss_for_static_page(ip)
+                if static_found_xss:
+                    print("Some XSS vulnerabilities were found.")
+                    dynamic_found_xss = []
+                    option = input("Do you want to scan for XSS vulnerabilities for dynamic pages? (y/n)")
+                    if option == "y":
+                        dynamic_found_xss = scan_xss_for_dynamic_page(ip)
+                else:
+                    print("Scanning for XSS vulnerabilities for dynamic pages.")
+                    dynamic_found_xss = scan_xss_for_dynamic_page(ip)
+                if static_found_xss:
+                    print(f"XSS vulnerabilities for static pages were found."
+                          f"\nVulnerabilities:\n{'\n'.join(static_found_xss)}")
+                if dynamic_found_xss:
+                    print(f"XSS vulnerabilities for dynamic pages were found."
+                          f"\nVulnerabilities:\n{'\n'.join(dynamic_found_xss)}")
+                input("Scan Done. Press any key to continue...")
+                clear_screen()
             case "0":
                 print("Bye")
                 break
             case _:
+                input("Provide a valid option.")
                 pass
 
 
@@ -47,6 +72,7 @@ def print_main_menu_and_get_option():
     print("Main menu")
     print("1- Perform attack surface recognition.")
     print("2- Get Services and Vulnerabilities.")
+    print("3- Scan for XSS Vulnerabilities.")
     print("0- Exit Suite.")
     print("=" * 20)
     return input("Choose an option: ")

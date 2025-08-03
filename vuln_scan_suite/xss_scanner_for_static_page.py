@@ -5,28 +5,25 @@ from urllib.parse import urljoin
 import requests
 from bs4 import BeautifulSoup
 from bs4.element import Tag
+from tqdm import tqdm
 
-XSS_PAYLOADS = [
-    "<script>alert(666)</script>",
-    "\"'><img src=x onerror=alert(666)>",
-    "<svg/onload=alert(666)>",
-    "';alert(666);//",
-]
+from vuln_scan_suite.constants import FIRST_PAYLOAD_CONTENT
+from vuln_scan_suite.utilities import get_xss_payloads
 
 
-def scan_xss(url, wait_time=3):
+def scan_xss_for_static_page(url, wait_time=3):
     print(f"[*] Scanning {url} for XSS...")
 
     forms = find_forms(url)
     print(f"[+] Found {len(forms)} forms.")
 
     found_xss = []
-    for i, form in enumerate(forms, 1):
+    for form in forms:
         details = get_form_details(form)
-        for payload in XSS_PAYLOADS:
+        for payload in tqdm(get_xss_payloads(FIRST_PAYLOAD_CONTENT), desc="Scanning forms..."):
             response = submit_form(details, url, payload)
             if payload in response.text:
-                found_xss.append(f"XSS found in form #{i} with payload: {payload}")
+                found_xss.append(f"XSS found in form {form} with payload: {payload}")
             sleep(wait_time)
     print("XSS found: ", found_xss)
     return found_xss
@@ -70,7 +67,6 @@ def submit_form(form_details, url, payload):
     target_url = urljoin(url, form_details["action"])
     data = prepare_input_text_tags_for_submit(form_details, payload)
     data.update(prepare_textarea_tags_for_submit(form_details, payload))
-    print("Attempting to submit: ", data)
 
     if form_details["method"] == "post":
         return requests.post(target_url, data=data)
@@ -88,4 +84,4 @@ def prepare_textarea_tags_for_submit(form_details, payload) -> dict:
 
 if __name__ == "__main__":
     target = input("Enter target URL (e.g. http://localhost/test): ")
-    scan_xss(target)
+    scan_xss_for_static_page(target)

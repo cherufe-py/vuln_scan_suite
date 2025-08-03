@@ -13,7 +13,7 @@ from vuln_scan_suite.utilities import handle_ports_argument, get_ttl_value_from_
 def scan_ports(host: str, ports: str):
     """Scans ports of the host."""
     ports = handle_ports_argument(ports)
-    for port in tqdm(ports, desc="Scanning..."):
+    for port in tqdm(ports, desc="Scanning ports..."):
         scan_port(host, port)
 
 
