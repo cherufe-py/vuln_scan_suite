@@ -1,9 +1,10 @@
+from time import sleep
+
 from selenium import webdriver
+from selenium.common import NoAlertPresentException
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service as ChromeService
-from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
-import time
 
 
 class Browser:
@@ -20,14 +21,17 @@ class Browser:
             options=chrome_options
         )
 
-    def get_page_source(self, url: str) -> str:
-        self.driver.get(url)
-        time.sleep(self.wait_time)  # Wait for JavaScript to execute
-        return self.driver.page_source
-
-    def contains(self, url: str, payload: str) -> bool:
-        html = self.get_page_source(url)
-        return payload in html
-
     def quit(self):
         self.driver.quit()
+
+    def extract_alert_content(self, wait_time=3, attempts=2) -> str:
+        while attempts:
+            try:
+                sleep(wait_time)
+                alert = self.driver.switch_to.alert
+                alert_text = alert.text
+                alert.accept()
+                return alert_text
+            except NoAlertPresentException:
+                attempts -= 1
+        return ""
