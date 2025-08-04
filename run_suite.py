@@ -4,8 +4,10 @@ Use this file to run the suite.
 import os
 
 from vuln_scan_suite.attack_surface_recognition import get_os, scan_ports
+from vuln_scan_suite.constants import COMMON_PORTS
 from vuln_scan_suite.cve_searcher import CveSearcher
 from vuln_scan_suite.services_and_vulnerabilities import scan_ports_and_service_versions
+from vuln_scan_suite.sqli_scanner import scan_sqli
 from vuln_scan_suite.xss_scanner_for_dynamic_page import scan_xss_for_dynamic_page
 from vuln_scan_suite.xss_scanner_for_static_page import scan_xss_for_static_page
 
@@ -57,6 +59,17 @@ def main():
                           f"\nVulnerabilities:\n{'\n'.join(dynamic_found_xss)}")
                 input("Scan Done. Press any key to continue...")
                 clear_screen()
+            case "4":
+                url = input("Provide the URL where the form displayed: ")
+                username = input("Provide username field name: ")
+                password = input("Provide password field name: ")
+                found_sqli = scan_sqli(url, username, password)
+                clear_screen()
+                if found_sqli:
+                    print(f"For URL {url} a SQLi vulnerability was found: {found_sqli}")
+                else:
+                    print(f"For URL {url} has no SQLi vulnerabilities.")
+                input("Scan Done. Press any key to continue...")
             case "0":
                 print("Bye")
                 break
@@ -73,6 +86,7 @@ def print_main_menu_and_get_option():
     print("1- Perform attack surface recognition.")
     print("2- Get Services and Vulnerabilities.")
     print("3- Scan for XSS Vulnerabilities.")
+    print("4- Scan for SQLi Vulnerabilities.")
     print("0- Exit Suite.")
     print("=" * 20)
     return input("Choose an option: ")
@@ -82,6 +96,7 @@ def print_get_host_and_ports_panel() -> dict:
     """Print panel to get host and ports from user."""
     ip = input("Provide an IP or Domain: ")
     ports = input("Provide ports to scan (keep blank to scan the commonest): ")
+    ports = ports if ports else COMMON_PORTS
     return {"host": ip, "ports": ports}
 
 

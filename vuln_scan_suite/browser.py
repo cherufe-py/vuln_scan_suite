@@ -4,6 +4,7 @@ from selenium import webdriver
 from selenium.common import NoAlertPresentException
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service as ChromeService
+from selenium.webdriver.support.wait import WebDriverWait
 from webdriver_manager.chrome import ChromeDriverManager
 
 
@@ -20,6 +21,9 @@ class Browser:
             service=ChromeService(ChromeDriverManager().install()),
             options=chrome_options
         )
+        self.default_wait_time = 10
+        self.driver.implicitly_wait(self.default_wait_time)
+        self.wait = WebDriverWait(self.driver, 10)
 
     def quit(self):
         self.driver.quit()
@@ -35,3 +39,13 @@ class Browser:
             except NoAlertPresentException:
                 attempts -= 1
         return ""
+
+    def is_element_available(self, by, criteria, wait_time=5):
+        try:
+            self.driver.implicitly_wait(wait_time)
+            self.driver.find_element(by, criteria)
+            self.driver.implicitly_wait(self.default_wait_time)
+            return True
+        except:
+            self.driver.implicitly_wait(self.default_wait_time)
+            return False
