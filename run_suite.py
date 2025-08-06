@@ -30,6 +30,8 @@ def main():
                 scanned_ports = scan_ports_and_service_versions(*host_and_ports.values())
                 cve_searcher = CveSearcher()
                 for scanned_port in scanned_ports:
+                    print("For Scanned Port: ", scanned_port.get("port"))
+                    print(f"It got the following service version: {' '.join(scanned_port.get('service_version'))}")
                     cves = cve_searcher.perform_clean_search_by_keywords(scanned_port.get('service_version'))
                     for index, cve in enumerate(cves):
                         desc = cve.get("description", "")
